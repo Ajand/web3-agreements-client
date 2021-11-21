@@ -2,6 +2,7 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
 import * as React from "react";
+import { Button } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
@@ -20,10 +21,9 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import FileIcon from "@mui/icons-material/FileCopy";
-import { useWeb3React } from '@web3-react/core'
-import { injected } from "./Connectors"
-
-
+import { useWeb3React } from "@web3-react/core";
+import { injected } from "./Connectors";
+import { ethers } from 'ethers'
 
 const drawerWidth = 240;
 
@@ -72,7 +72,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   justifyContent: "flex-end",
 }));
 
-const Layout = ({ children }) => {
+const Layout = ({ children, provider, setProvider }) => {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
 
@@ -84,24 +84,15 @@ const Layout = ({ children }) => {
     setOpen(false);
   };
 
-  const { active, account, library, connector, activate, deactivate } = useWeb3React()
-
-  console.log(library)
-
   async function connect() {
-    try {
-      await activate(injected)
-    } catch (ex) {
-      console.log(ex)
-    }
+    const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+    // Prompt user for account connections
+    await provider.send("eth_requestAccounts", []);
+    setProvider(provider)
   }
 
-  async function disconnect() {
-    try {
-      deactivate()
-    } catch (ex) {
-      console.log(ex)
-    }
+  const disconnect = async () => {
+
   }
 
 
@@ -110,21 +101,6 @@ const Layout = ({ children }) => {
       <CssBaseline />
       <Header color="secondary" position="fixed" open={open}>
         <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={() => {
-              connect()
-            }}
-            edge="start"
-            sx={{ mr: 2, ...(open && { display: "none" }) }}
-            css={css`
-              color: ${theme.palette.primary.main};
-            `}
-            
-          >
-            <MenuIcon />
-          </IconButton>
           <Typography
             css={css`
               color: ${theme.palette.primary.main};
@@ -135,6 +111,11 @@ const Layout = ({ children }) => {
           >
             Web3 Works
           </Typography>
+          {!provider ? (
+            <Button onClick={() => connect()}>Activate</Button>
+          ) : (
+            <Button onClick={() => disconnect()}>Deactivate</Button>
+          )}
         </Toolbar>
       </Header>
       <Drawer

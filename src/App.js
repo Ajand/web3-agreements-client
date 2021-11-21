@@ -2,12 +2,13 @@ import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
 import { BrowserRouter } from "react-router-dom";
 import { Web3ReactProvider } from "@web3-react/core";
 import { ethers } from "ethers";
+import { useState } from 'react'
 
 import Layout from "./components/Layout";
 import Router from "./components/Router";
 
 function getLibrary() {
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
 
   return provider;
 }
@@ -31,13 +32,18 @@ const theme = createTheme({
 });
 
 const App = () => {
+
+  const [provider, setProvider] = useState(null)
+
+  console.log(provider?.getSigner().provider)
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Web3ReactProvider getLibrary={getLibrary}>
-        <Layout>
+        <Layout provider={provider} setProvider={setProvider}>
           <BrowserRouter>
-            <Router />
+            <Router provider={provider} />
           </BrowserRouter>
         </Layout>
       </Web3ReactProvider>
