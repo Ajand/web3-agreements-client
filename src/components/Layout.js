@@ -23,7 +23,7 @@ import InboxIcon from "@mui/icons-material/MoveToInbox";
 import FileIcon from "@mui/icons-material/FileCopy";
 import { useWeb3React } from "@web3-react/core";
 import { injected } from "./Connectors";
-import { ethers } from 'ethers'
+import { ethers } from "ethers";
 
 const drawerWidth = 240;
 
@@ -88,19 +88,16 @@ const Layout = ({ children, provider, setProvider }) => {
     const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
     // Prompt user for account connections
     await provider.send("eth_requestAccounts", []);
-    setProvider(provider)
+    setProvider(provider);
   }
 
-  const disconnect = async () => {
-
-  }
-
+  const disconnect = async () => {};
 
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <Header color="secondary" position="fixed" open={open}>
-        <Toolbar>
+        <Toolbar css={css`display: flex; justify-content: space-between;`}>
           <Typography
             css={css`
               color: ${theme.palette.primary.main};
@@ -109,13 +106,9 @@ const Layout = ({ children, provider, setProvider }) => {
             noWrap
             component="div"
           >
-            Web3 Works
+            Web3 Agreements
           </Typography>
-          {!provider ? (
-            <Button onClick={() => connect()}>Activate</Button>
-          ) : (
-            <Button onClick={() => disconnect()}>Deactivate</Button>
-          )}
+          {!provider && <Button onClick={() => connect()}>Activate</Button>}
         </Toolbar>
       </Header>
       <Drawer

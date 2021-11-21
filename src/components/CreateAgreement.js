@@ -119,16 +119,11 @@ const CreateAgreement = ({ provider }) => {
           variant="contained"
          // disabled={!doc || !employee || !prize || isNaN(prize)}
           onClick={async () => {
-            const agreementManager = new ethers.Contract(
-              addresses.local.agreementManagerAddress,
-              agreementManagerAbi,
-              provider.getSigner()
-            );
+            
 
             upload(doc)
               .then(async (cid) => {
                 const agreementURI = `ipfs://${cid}`;
-                console.log(agreementURI);
                 if (
                   provider?.network.chainId == 1337 ||
                   provider?.network.chainId == 31337

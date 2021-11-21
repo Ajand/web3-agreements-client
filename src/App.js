@@ -1,8 +1,13 @@
-import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
+import {
+  ThemeProvider,
+  createTheme,
+  CssBaseline,
+  Typography,
+} from "@mui/material";
 import { BrowserRouter } from "react-router-dom";
 import { Web3ReactProvider } from "@web3-react/core";
 import { ethers } from "ethers";
-import { useState } from 'react'
+import { useState } from "react";
 
 import Layout from "./components/Layout";
 import Router from "./components/Router";
@@ -32,19 +37,26 @@ const theme = createTheme({
 });
 
 const App = () => {
+  const [provider, setProvider] = useState(null);
 
-  const [provider, setProvider] = useState(null)
+  console.log(provider?.getSigner().provider);
 
-  console.log(provider?.getSigner().provider)
+  const renderHelper = () => {
+    if (!provider)
+      return <Typography variant="h6">Please Connect The Metamask </Typography>;
+    return (
+      <BrowserRouter>
+        <Router provider={provider} />
+      </BrowserRouter>
+    );
+  };
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Web3ReactProvider getLibrary={getLibrary}>
         <Layout provider={provider} setProvider={setProvider}>
-          <BrowserRouter>
-            <Router provider={provider} />
-          </BrowserRouter>
+          {renderHelper()}
         </Layout>
       </Web3ReactProvider>
     </ThemeProvider>

@@ -1,3 +1,6 @@
+/* eslint-disable react/react-in-jsx-scope -- Unaware of jsxImportSource */
+/** @jsxImportSource @emotion/react */
+import { css } from "@emotion/react";
 import { useEffect, useState } from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -6,17 +9,18 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+import  Button  from "@mui/material/Button";
 
 import { ethers } from "ethers";
 import agreementManagerAbi from "../abi/agreementManagerAbi";
 import addresses from "./addresses";
 
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
 
 export default function Agreements({ provider }) {
   const [agreementsCount, setAgreementsCount] = useState(0);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchInterval = setInterval(async () => {
@@ -44,27 +48,37 @@ export default function Agreements({ provider }) {
     };
   }, [provider]);
 
-
-  console.log(agreementsCount)
+  console.log(agreementsCount);
 
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell>Agreement ID</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {Array(agreementsCount)
-            .fill(0)
-            .map((row, i) => (
-              <TableRow onClick={() => navigate(`/agreement/${i}`)} key={i}>
-                <TableCell>{i}</TableCell>
-              </TableRow>
-            ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <div>
+      <div
+        css={css`
+          margin-bottom: 1em;
+        `}
+      >
+        <Button onClick={() => navigate('/create')} variant="contained" color="primary">
+          Create New Agreement
+        </Button>
+      </div>
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell>Agreement ID</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {Array(agreementsCount)
+              .fill(0)
+              .map((row, i) => (
+                <TableRow onClick={() => navigate(`/agreement/${i}`)} key={i}>
+                  <TableCell>{i}</TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </div>
   );
 }
