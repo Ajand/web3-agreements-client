@@ -5,13 +5,16 @@ import { TextField, Typography, Grid, Paper, Button } from "@mui/material";
 import MDEditor from "@uiw/react-md-editor";
 import { useState } from "react";
 import moment from "moment";
+import { useWeb3React } from "@web3-react/core";
+import { ethers } from "ethers";
+import agreementManagerAbi from "../abi/agreementManagerAbi";
+import addresses from "./addresses";
 
 import DatePicker from "@mui/lab/DatePicker";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import DateAdapter from "@mui/lab/AdapterMoment";
 
 import upload from "./upload";
-
 
 /**
  * 
@@ -21,13 +24,14 @@ import upload from "./upload";
         uint256 _dueDate
  */
 
-const CreateAgreement = () => {
+const CreateAgreement = ({ provider }) => {
   const [doc, setDoc] = useState(
     "**This Document will be used in case of any dispute**"
   );
   const [employee, setEmployee] = useState("");
   const [prize, setPrize] = useState("");
   const [dueDate, setDueDate] = useState(moment());
+
 
   return (
     <div
@@ -113,15 +117,43 @@ const CreateAgreement = () => {
           fullWidth
           color="secondary"
           variant="contained"
-          disabled={!doc || !employee || !prize || isNaN(prize)}
-          onClick={() => {
-            console.log("CREATING THE THING");
-            upload(doc)
-              .then((cid) => {
-                  const agreementURI = `ipfs://${cid}`
-                  console.log(agreementURI)
+         // disabled={!doc || !employee || !prize || isNaN(prize)}
+          onClick={async () => {
+            const agreementManager = new ethers.Contract(
+              addresses.local.agreementManagerAddress,
+              agreementManagerAbi,
+              provider.getSigner()
+            );
 
-                  // let's deploy contract and done it
+            upload(doc)
+              .then(async (cid) => {
+                const agreementURI = `ipfs://${cid}`;
+                console.log(agreementURI);
+                if (
+                  provider?.network.chainId == 1337 ||
+                  provider?.network.chainId == 31337
+                ) {
+                  const agreementManager = new ethers.Contract(
+                    addresses.local.agreementManagerAddress,
+                    agreementManagerAbi,
+                    provider.getSigner()
+                  );
+                  await agreementManager.createAgreement(
+                    addresses.local.wEthAddress,
+                    agreementURI,
+                    Number(prize)
+                  );
+                  const agreementId = await agreementManager.agreementCounts()
+                  console.log(agreementId)
+                  // TODO routing need to be implemented
+                } else if (provider?.network.chainId == 42) {
+                  // TODO
+                } else if (provider?.network.chainId == 4) {
+                } else {
+                  alert(
+                    "Unsupported network. Please switch to rinkeby or kovan."
+                  );
+                }
               })
               .catch((err) => console.log(err));
           }}
